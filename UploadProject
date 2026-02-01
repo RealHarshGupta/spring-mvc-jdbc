@@ -1,0 +1,122 @@
+
+
+## Steps to Deploy a Full-Stack Application on AWS
+
+1. Remove `"localhost:8080"` from `logic.js`.
+
+2. Convert the project packaging from **WAR** to **JAR** in `pom.xml`.
+
+3. Remove the `<scope>provided</scope>` tag from the Tomcat dependency in `pom.xml`.
+
+4. Push the project to a GitHub repository.
+
+5. Launch a new EC2 instance on AWS.
+
+6. Select **Ubuntu** as the operating system.
+
+7. Create a **key pair (.pem file)** and download it to your system (keep it in the *Downloads* folder).
+
+8. In the **Security Group**, edit inbound rules and add:
+
+   * Custom TCP
+   * Port: **8080**
+   * Source: **Anywhere (IPv4)**
+
+9. Open **Command Prompt** and navigate to the Downloads directory.
+
+10. On Windows, run the following commands to set key permissions:
+
+```bash
+icacls springboot-key.pem /inheritance:r
+icacls springboot-key.pem /grant:r "%username%:R"
+```
+
+11. Connect to the EC2 instance using SSH:
+
+```bash
+ssh -i springboot-key.pem ubuntu@<EC2_PUBLIC_IP>
+```
+
+> Replace `<EC2_PUBLIC_IP>` with the public IP copied from the AWS EC2 dashboard.
+
+12. Update the Ubuntu system:
+
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+13. Install required software:
+
+```bash
+sudo apt install openjdk-17-jdk -y
+sudo apt install mysql-server -y
+sudo apt install git -y
+```
+
+14. Configure MySQL:
+
+```bash
+sudo mysql
+```
+
+```sql
+ALTER USER 'root'@'localhost'
+IDENTIFIED WITH mysql_native_password
+BY 'NewStrongPassword@123';
+
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+Reconnect to MySQL:
+
+```bash
+mysql -u root -p
+```
+
+15. Create the database and table:
+
+```sql
+CREATE DATABASE authdb_jdbc;
+USE authdb_jdbc;
+
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+EXIT;
+```
+
+16. Install Maven:
+
+```bash
+sudo apt install maven -y
+```
+
+17. Build the project:
+
+```bash
+mvn clean package -DskipTests
+```
+
+18. Verify that the JAR file is created:
+
+```bash
+ls target
+```
+
+> The JAR file should be visible in the `target` directory.
+
+19. Run the Spring Boot application in the background:
+
+```bash
+nohup java -jar target/springmvcjdbc-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+```
+
+20. The server is now running. You can safely exit the terminal.
+
+---
+
