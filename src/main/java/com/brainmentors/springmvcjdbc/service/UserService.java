@@ -34,7 +34,7 @@ public class UserService {
 
     public String login(User user){
         Optional<User> opt = userRepository.findByEmail((user.getEmail()));
-        System.out.print(user.getEmail()+"error");
+        // System.out.print(user.getEmail()+"error");
         if(opt.isEmpty()){
             return "invalid email or password.....";
             

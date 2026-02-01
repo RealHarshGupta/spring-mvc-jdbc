@@ -52,7 +52,7 @@ function doLogin(){
     };
 
     console.log(user);
-    const url="http://localhost:8080/login";
+    const url="/login";
 
     const promise = fetch(url,
         {method:"POST",
